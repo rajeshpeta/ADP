@@ -1,0 +1,44 @@
+Step1:
+sudo apt-get install vagrant
+
+Step2:
+Create a file `Vargantfile` and add the below content
+vagrant box add centos-6.5-x86_64 centos-6.5-x86_64.box
+vagrant init centos-6.5-x86_64
+
+Step3:
+login into the vagrant instance
+
+Step4:
+Create the Dockefile with below content
+
+FROM dockerfile/ubuntu
+# Install Nginx.
+RUN \
+  add-apt-repository -y ppa:nginx/stable && \
+  apt-get update && \
+  apt-get install -y nginx && \
+  rm -rf /var/lib/apt/lists/* && \
+#in this nginx config we have the configuration to pickup different html file.
+echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
+  chown -R www-data:www-data /var/lib/nginx
+VOLUME ["/etc/nginx/sites-enabled", "/etc/nginx/certs", "/etc/nginx/conf.d", "/var/log/nginx", "/var/www/1.html", "/var/www/2.html","/var/www/3.html"]
+
+WORKDIR /etc/nginx
+CMD ["nginx"]
+EXPOSE 80
+EXPOSE 443
+
+Step 5
+Run the dockerfile
+docker build -t "dockerfile/nginx" .
+docker run -d -p 80:80 dockerfile/nginx
+
+
+Step6: 
+On vagrant hosts file `/etc/hosts` ,add.  the below entries
+myfirstpage.com 127.0.0.1
+mysecondpage.com 127.0.0.1
+mythirdpage.com 127.0.0.1
+
+
